@@ -1,0 +1,203 @@
+{
+  "featuredCards": [
+    {
+      "id": "fc1",
+      "title": "Configurações de Conta",
+      "description": "Aprenda a configurar e personalizar a sua conta na Adapta.",
+      "icon": "settings",
+      "link": "/categoria/configuracoes",
+      "color": "#10b981",
+      "order": 1
+    },
+    {
+      "id": "fc2",
+      "title": "Pagamentos",
+      "description": "Aprenda sobre notas fiscais, pagamentos e assinaturas.",
+      "icon": "wallet",
+      "link": "/categoria/pagamentos",
+      "color": "#10b981",
+      "order": 2
+    },
+    {
+      "id": "fc3",
+      "title": "Segurança",
+      "description": "Leia sobre as políticas de segurança do DevClub.",
+      "icon": "shield",
+      "link": "/categoria/seguranca",
+      "color": "#10b981",
+      "order": 3
+    }
+  ],
+  "categories": [
+    { "id": "1", "name": "Sobre a Formação", "slug": "sobre-a-formacao", "order": 1 },
+    { "id": "2", "name": "Acesso e Plataforma", "slug": "acesso-e-plataforma", "order": 2 },
+    { "id": "3", "name": "Pagamento e Matrícula", "slug": "pagamento-e-matricula", "order": 3 },
+    { "id": "4", "name": "Conteúdo e Metodologia", "slug": "conteudo-e-metodologia", "order": 4 },
+    { "id": "5", "name": "Suporte e Comunidade", "slug": "suporte-e-comunidade", "order": 5 },
+    { "id": "6", "name": "Carreira", "slug": "carreira", "order": 6 }
+  ],
+  "faqs": [
+    {
+      "id": "f1",
+      "categoryId": "1",
+      "question": "O que é a Formação DevClub?",
+      "answer": "A Formação DevClub é um programa completo de formação em desenvolvimento web que te leva do zero ao profissional. Você aprenderá as tecnologias mais demandadas pelo mercado, com projetos práticos e suporte personalizado.",
+      "order": 1,
+      "createdAt": "2025-01-01T00:00:00.000Z",
+      "updatedAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "f2",
+      "categoryId": "1",
+      "question": "Qual a duração do curso?",
+      "answer": "A formação tem uma carga horária estimada de 6 meses a 1 ano, dependendo da sua dedicação. Porém, o acesso é vitalício, então você pode estudar no seu próprio ritmo.",
+      "order": 2,
+      "createdAt": "2025-01-01T00:00:00.000Z",
+      "updatedAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "f3",
+      "categoryId": "1",
+      "question": "Preciso ter experiência prévia em programação?",
+      "answer": "Não! A Formação DevClub foi criada para iniciantes. Começamos do absoluto zero, explicando cada conceito de forma clara e prática. Tudo que você precisa é de um computador e vontade de aprender.",
+      "order": 3,
+      "createdAt": "2025-01-01T00:00:00.000Z",
+      "updatedAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "f4",
+      "categoryId": "2",
+      "question": "Como acesso a plataforma?",
+      "answer": "Após a confirmação do pagamento, você receberá um e-mail com suas credenciais de acesso. Basta acessar a plataforma através do link fornecido e fazer login com seu e-mail e senha.",
+      "order": 1,
+      "createdAt": "2025-01-01T00:00:00.000Z",
+      "updatedAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "f5",
+      "categoryId": "2",
+      "question": "Esqueci minha senha, como recupero?",
+      "answer": "Na tela de login, clique em \"Esqueci minha senha\". Digite seu e-mail cadastrado e você receberá um link para criar uma nova senha. Se não encontrar o e-mail, verifique sua caixa de spam.",
+      "order": 2,
+      "createdAt": "2025-01-01T00:00:00.000Z",
+      "updatedAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "f6",
+      "categoryId": "2",
+      "question": "O acesso é vitalício?",
+      "answer": "Sim! Uma vez que você se matricula na Formação DevClub, seu acesso é vitalício. Você pode assistir às aulas quantas vezes quiser, para sempre.",
+      "order": 3,
+      "createdAt": "2025-01-01T00:00:00.000Z",
+      "updatedAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "f7",
+      "categoryId": "3",
+      "question": "Quais formas de pagamento são aceitas?",
+      "answer": "Aceitamos cartão de crédito (em até 12x), boleto bancário, PIX e PayPal. Todas as transações são processadas de forma segura.",
+      "order": 1,
+      "createdAt": "2025-01-01T00:00:00.000Z",
+      "updatedAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "f8",
+      "categoryId": "3",
+      "question": "Como funciona o parcelamento?",
+      "answer": "O parcelamento pode ser feito em até 12x no cartão de crédito. Os juros variam de acordo com a bandeira do cartão. No PIX ou boleto, o pagamento é à vista com desconto especial.",
+      "order": 2,
+      "createdAt": "2025-01-01T00:00:00.000Z",
+      "updatedAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "f9",
+      "categoryId": "3",
+      "question": "Tem garantia de reembolso?",
+      "answer": "Sim! Oferecemos garantia incondicional de 7 dias. Se por qualquer motivo você não ficar satisfeito, basta solicitar o reembolso dentro desse período e devolveremos 100% do seu investimento.",
+      "order": 3,
+      "createdAt": "2025-01-01T00:00:00.000Z",
+      "updatedAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "f10",
+      "categoryId": "4",
+      "question": "Quais tecnologias são ensinadas?",
+      "answer": "Você aprenderá HTML, CSS, JavaScript, React, Node.js, banco de dados (SQL e NoSQL), Git, APIs REST, TypeScript e muito mais. O conteúdo é constantemente atualizado com as tecnologias mais demandadas pelo mercado.",
+      "order": 1,
+      "createdAt": "2025-01-01T00:00:00.000Z",
+      "updatedAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "f11",
+      "categoryId": "4",
+      "question": "Tem projetos práticos?",
+      "answer": "Sim! A Formação DevClub é focada em prática. Você desenvolverá diversos projetos reais que poderão compor seu portfólio profissional, desde sites simples até aplicações completas.",
+      "order": 2,
+      "createdAt": "2025-01-01T00:00:00.000Z",
+      "updatedAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "f12",
+      "categoryId": "4",
+      "question": "Recebo certificado ao concluir?",
+      "answer": "Sim! Ao completar a formação, você recebe um certificado de conclusão que pode ser adicionado ao seu LinkedIn e currículo.",
+      "order": 3,
+      "createdAt": "2025-01-01T00:00:00.000Z",
+      "updatedAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "f13",
+      "categoryId": "5",
+      "question": "Como tiro dúvidas durante o curso?",
+      "answer": "Você pode tirar dúvidas através da comunidade exclusiva de alunos, onde professores e monitores respondem suas perguntas. Também temos aulas ao vivo semanais para tirar dúvidas em tempo real.",
+      "order": 1,
+      "createdAt": "2025-01-01T00:00:00.000Z",
+      "updatedAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "f14",
+      "categoryId": "5",
+      "question": "Tem suporte ao vivo?",
+      "answer": "Sim! Temos aulas ao vivo semanais onde você pode interagir diretamente com os professores e tirar suas dúvidas em tempo real. As gravações também ficam disponíveis.",
+      "order": 2,
+      "createdAt": "2025-01-01T00:00:00.000Z",
+      "updatedAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "f15",
+      "categoryId": "5",
+      "question": "Como acesso a comunidade?",
+      "answer": "Ao se matricular, você recebe acesso à nossa comunidade exclusiva no Discord. Lá você pode interagir com outros alunos, participar de eventos e receber suporte.",
+      "order": 3,
+      "createdAt": "2025-01-01T00:00:00.000Z",
+      "updatedAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "f16",
+      "categoryId": "6",
+      "question": "Vocês ajudam a conseguir emprego?",
+      "answer": "Sim! Temos um módulo completo de empregabilidade com dicas de currículo, LinkedIn, portfólio e entrevistas. Também compartilhamos vagas exclusivas na comunidade.",
+      "order": 1,
+      "createdAt": "2025-01-01T00:00:00.000Z",
+      "updatedAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "f17",
+      "categoryId": "6",
+      "question": "Tem auxílio para montar currículo?",
+      "answer": "Sim! Temos aulas específicas sobre como montar um currículo atrativo para a área de tecnologia, além de templates e revisões da comunidade.",
+      "order": 2,
+      "createdAt": "2025-01-01T00:00:00.000Z",
+      "updatedAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "f18",
+      "categoryId": "6",
+      "question": "Quanto tempo até conseguir emprego?",
+      "answer": "Isso varia de acordo com sua dedicação, mas muitos alunos conseguem sua primeira oportunidade entre 6 meses e 1 ano de estudo. O mais importante é seguir o método e não desistir!",
+      "order": 3,
+      "createdAt": "2025-01-01T00:00:00.000Z",
+      "updatedAt": "2025-01-01T00:00:00.000Z"
+    }
+  ]
+}

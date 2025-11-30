@@ -1,0 +1,240 @@
+/* FAQ Content Styles - GitBook Style */
+.faq-content {
+  margin-top: 1rem;
+  line-height: 1.7;
+  color: var(--ifm-font-color-base);
+}
+
+/* Typography */
+.faq-content h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin: 1.5rem 0 1rem;
+  line-height: 1.3;
+  color: var(--ifm-font-color-base);
+}
+
+.faq-content h1:first-child {
+  margin-top: 0;
+}
+
+.faq-content h2 {
+  font-size: 1.375rem;
+  font-weight: 600;
+  margin: 1.25rem 0 0.75rem;
+  line-height: 1.4;
+  color: var(--ifm-font-color-base);
+}
+
+.faq-content h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 1rem 0 0.5rem;
+  line-height: 1.5;
+  color: var(--ifm-font-color-base);
+}
+
+.faq-content p {
+  margin: 0 0 1rem;
+  line-height: 1.7;
+}
+
+.faq-content p:last-child {
+  margin-bottom: 0;
+}
+
+.faq-content strong {
+  font-weight: 600;
+}
+
+.faq-content em {
+  font-style: italic;
+}
+
+.faq-content u {
+  text-decoration: underline;
+}
+
+.faq-content s {
+  text-decoration: line-through;
+}
+
+/* Links - GitBook Style */
+.faq-content a {
+  color: var(--ifm-color-primary);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.15s;
+}
+
+.faq-content a:hover {
+  border-bottom-color: var(--ifm-color-primary);
+}
+
+/* Lists */
+.faq-content ul,
+.faq-content ol {
+  margin: 0 0 1rem;
+  padding-left: 1.5rem;
+}
+
+.faq-content li {
+  margin: 0.25rem 0;
+  line-height: 1.7;
+}
+
+.faq-content li p {
+  margin: 0;
+}
+
+.faq-content ul li::marker {
+  color: var(--ifm-color-primary);
+}
+
+/* Blockquote - GitBook Style */
+.faq-content blockquote {
+  margin: 1rem 0;
+  padding: 0.75rem 1rem;
+  border-left: 3px solid var(--ifm-color-primary);
+  background: var(--ifm-background-surface-color);
+  border-radius: 0 var(--ifm-global-radius) var(--ifm-global-radius) 0;
+}
+
+.faq-content blockquote p {
+  margin: 0;
+  color: var(--faq-text-muted);
+}
+
+/* Code Block */
+.faq-content pre {
+  background: #1e1e1e;
+  border-radius: var(--ifm-global-radius);
+  padding: 1rem;
+  margin: 1rem 0;
+  overflow-x: auto;
+}
+
+.faq-content pre code {
+  background: none;
+  padding: 0;
+  font-size: 0.875rem;
+  color: #d4d4d4;
+  font-family: 'Fira Code', 'Monaco', 'Consolas', monospace;
+}
+
+/* Inline Code */
+.faq-content code {
+  background: var(--ifm-background-surface-color);
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.875em;
+  font-family: 'Fira Code', 'Monaco', 'Consolas', monospace;
+  color: var(--ifm-color-primary-dark);
+}
+
+/* Images */
+.faq-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--ifm-global-radius);
+  margin: 1rem 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Horizontal Rule */
+.faq-content hr {
+  border: none;
+  border-top: 1px solid var(--faq-border-color);
+  margin: 2rem 0;
+}
+
+/* Dark Mode */
+[data-theme='dark'] .faq-content pre {
+  background: #0d1117;
+}
+
+[data-theme='dark'] .faq-content code {
+  color: var(--ifm-color-primary-light);
+}
+
+[data-theme='dark'] .faq-content img {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Hint/Callout Boxes - GitBook Style */
+.faq-content .hint {
+  padding: 1rem;
+  border-radius: var(--ifm-global-radius);
+  margin: 1rem 0;
+}
+
+.faq-content .hint-info {
+  background: rgba(99, 102, 241, 0.1);
+  border-left: 3px solid var(--ifm-color-primary);
+}
+
+.faq-content .hint-warning {
+  background: rgba(245, 158, 11, 0.1);
+  border-left: 3px solid #f59e0b;
+}
+
+.faq-content .hint-success {
+  background: rgba(34, 197, 94, 0.1);
+  border-left: 3px solid #22c55e;
+}
+
+.faq-content .hint-danger {
+  background: rgba(239, 68, 68, 0.1);
+  border-left: 3px solid #ef4444;
+}
+
+/* Tables */
+.faq-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+}
+
+.faq-content th,
+.faq-content td {
+  padding: 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid var(--faq-border-color);
+}
+
+.faq-content th {
+  font-weight: 600;
+  background: var(--ifm-background-surface-color);
+}
+
+.faq-content tr:hover td {
+  background: rgba(99, 102, 241, 0.03);
+}
+
+/* Text Alignment */
+.faq-content [style*="text-align: center"] {
+  text-align: center;
+}
+
+.faq-content [style*="text-align: right"] {
+  text-align: right;
+}
+
+/* Responsive Images */
+@media (max-width: 768px) {
+  .faq-content h1 {
+    font-size: 1.5rem;
+  }
+
+  .faq-content h2 {
+    font-size: 1.25rem;
+  }
+
+  .faq-content h3 {
+    font-size: 1rem;
+  }
+
+  .faq-content img {
+    margin: 0.75rem 0;
+  }
+}
