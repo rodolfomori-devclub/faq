@@ -1,4 +1,5 @@
 import React from 'react';
+import './SearchBar.css';
 
 interface SearchBarProps {
   value: string;
@@ -8,17 +9,9 @@ interface SearchBarProps {
 export default function SearchBar({ value, onChange }: SearchBarProps): JSX.Element {
   return (
     <div className="search-container">
-      <div style={{ position: 'relative' }}>
+      <div className="search-wrapper">
         <svg
-          style={{
-            position: 'absolute',
-            left: '1rem',
-            top: '50%',
-            transform: 'translateY(-50%)',
-            width: '20px',
-            height: '20px',
-            color: 'var(--faq-text-muted)',
-          }}
+          className="search-icon"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -33,7 +26,7 @@ export default function SearchBar({ value, onChange }: SearchBarProps): JSX.Elem
         <input
           type="text"
           className="search-input"
-          placeholder="Buscar perguntas..."
+          placeholder="Buscar perguntas frequentes..."
           value={value}
           onChange={(e) => onChange(e.target.value)}
         />

@@ -8,6 +8,11 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ categories, activeCategory, onCategoryClick }: SidebarProps): JSX.Element {
+  const handleCategoryClick = (category: Category) => {
+    // Redireciona para a rota da categoria
+    window.location.href = `/categoria/${category.slug}`;
+  };
+
   return (
     <nav className="sidebar-container">
       <div className="sidebar-category">
@@ -25,15 +30,11 @@ export default function Sidebar({ categories, activeCategory, onCategoryClick }:
         {categories.map((category) => (
           <a
             key={category.id}
-            href={`#${category.slug}`}
+            href={`/categoria/${category.slug}`}
             className={`sidebar-item ${activeCategory === category.id ? 'active' : ''}`}
             onClick={(e) => {
               e.preventDefault();
-              onCategoryClick(category.id);
-              const element = document.getElementById(category.slug);
-              if (element) {
-                element.scrollIntoView({ behavior: 'smooth' });
-              }
+              handleCategoryClick(category);
             }}
           >
             {category.name}

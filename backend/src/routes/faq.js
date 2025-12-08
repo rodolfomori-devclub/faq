@@ -174,6 +174,23 @@ router.put('/categories/:id', (req, res) => {
   }
 });
 
+// GET /api/categories/slug/:slug - Buscar categoria por slug
+router.get('/categories/slug/:slug', (req, res) => {
+  try {
+    const { slug } = req.params;
+    const db = readDb();
+    const category = db.categories.find(c => c.slug === slug);
+
+    if (!category) {
+      return res.status(404).json({ error: 'Categoria não encontrada' });
+    }
+
+    res.json(category);
+  } catch (error) {
+    res.status(500).json({ error: 'Erro ao buscar categoria' });
+  }
+});
+
 // DELETE /api/categories/:id - Deletar categoria
 router.delete('/categories/:id', (req, res) => {
   try {

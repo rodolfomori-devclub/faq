@@ -21,6 +21,10 @@ const config: Config = {
     locales: ['pt-BR'],
   },
 
+  plugins: [
+    './src/plugins/category-pages-plugin.js',
+  ],
+
   presets: [
     [
       'classic',

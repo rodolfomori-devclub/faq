@@ -2,39 +2,69 @@
   "featuredCards": [
     {
       "id": "fc1",
-      "title": "Configurações de Conta",
-      "description": "Aprenda a configurar e personalizar a sua conta na Adapta.",
-      "icon": "settings",
-      "link": "/categoria/configuracoes",
-      "color": "#10b981",
+      "title": "Sobre a Formação",
+      "description": "Conheça tudo sobre a Formação DevClub e como ela funciona.",
+      "icon": "book",
+      "link": "/categoria/sobre-a-formacao",
+      "color": "#6366f1",
       "order": 1
     },
     {
       "id": "fc2",
-      "title": "Pagamentos",
-      "description": "Aprenda sobre notas fiscais, pagamentos e assinaturas.",
+      "title": "Pagamento e Matrícula",
+      "description": "Informações sobre formas de pagamento, parcelamento e garantia.",
       "icon": "wallet",
-      "link": "/categoria/pagamentos",
+      "link": "/categoria/pagamento-e-matricula",
       "color": "#10b981",
       "order": 2
     },
     {
       "id": "fc3",
-      "title": "Segurança",
-      "description": "Leia sobre as políticas de segurança do DevClub.",
-      "icon": "shield",
-      "link": "/categoria/seguranca",
-      "color": "#10b981",
+      "title": "Acesso e Plataforma",
+      "description": "Saiba como acessar a plataforma e recuperar sua senha.",
+      "icon": "settings",
+      "link": "/categoria/acesso-e-plataforma",
+      "color": "#3b82f6",
       "order": 3
     }
   ],
   "categories": [
-    { "id": "1", "name": "Sobre a Formação", "slug": "sobre-a-formacao", "order": 1 },
-    { "id": "2", "name": "Acesso e Plataforma", "slug": "acesso-e-plataforma", "order": 2 },
-    { "id": "3", "name": "Pagamento e Matrícula", "slug": "pagamento-e-matricula", "order": 3 },
-    { "id": "4", "name": "Conteúdo e Metodologia", "slug": "conteudo-e-metodologia", "order": 4 },
-    { "id": "5", "name": "Suporte e Comunidade", "slug": "suporte-e-comunidade", "order": 5 },
-    { "id": "6", "name": "Carreira", "slug": "carreira", "order": 6 }
+    {
+      "id": "1",
+      "name": "Sobre a Formação",
+      "slug": "sobre-a-formacao",
+      "order": 1
+    },
+    {
+      "id": "2",
+      "name": "Acesso e Plataforma",
+      "slug": "acesso-e-plataforma",
+      "order": 2
+    },
+    {
+      "id": "3",
+      "name": "Pagamento e Matrícula",
+      "slug": "pagamento-e-matricula",
+      "order": 3
+    },
+    {
+      "id": "4",
+      "name": "Conteúdo e Metodologia",
+      "slug": "conteudo-e-metodologia",
+      "order": 4
+    },
+    {
+      "id": "5",
+      "name": "Suporte e Comunidade",
+      "slug": "suporte-e-comunidade",
+      "order": 5
+    },
+    {
+      "id": "6",
+      "name": "Carreira",
+      "slug": "carreira",
+      "order": 6
+    }
   ],
   "faqs": [
     {
