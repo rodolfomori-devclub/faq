@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '@theme/Layout';
 import Link from '@docusaurus/Link';
+import BrowserOnly from '@docusaurus/BrowserOnly';
 import { API_URL } from '../../config';
 import type { Category } from '../../types';
 
-export default function CategoriesAdmin(): JSX.Element {
+function CategoriesAdminContent(): JSX.Element {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isAuthorized, setIsAuthorized] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [formData, setFormData] = useState({ name: '' });
@@ -21,8 +23,32 @@ export default function CategoriesAdmin(): JSX.Element {
   });
 
   useEffect(() => {
-    fetchCategories();
+    checkAuthAndFetch();
   }, []);
+
+  const checkAuthAndFetch = async () => {
+    const token = localStorage.getItem('faq_admin_token');
+    if (!token) {
+      window.location.href = '/admin/login';
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_URL}/auth/verify`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await response.json();
+      if (response.ok && data.valid) {
+        setIsAuthorized(true);
+        fetchCategories();
+      } else {
+        localStorage.removeItem('faq_admin_token');
+        window.location.href = '/admin/login';
+      }
+    } catch (error) {
+      window.location.href = '/admin/login';
+    }
+  };
 
   const fetchCategories = async () => {
     try {
@@ -121,25 +147,34 @@ export default function CategoriesAdmin(): JSX.Element {
     setFormData({ name: '' });
   };
 
-  return (
-    <Layout title="Categorias" description="Gerenciar categorias do FAQ">
+  if (!isAuthorized) {
+    return (
       <div className="admin-container">
-        <div className="admin-header">
-          <h1 className="admin-title">Categorias</h1>
-          <div style={{ display: 'flex', gap: '0.5rem' }}>
-            <Link to="/admin" className="admin-btn admin-btn-secondary">
-              Voltar
-            </Link>
-            {!showForm && (
-              <button
-                className="admin-btn admin-btn-primary"
-                onClick={() => setShowForm(true)}
-              >
-                + Nova Categoria
-              </button>
-            )}
-          </div>
+        <div className="loading">
+          <div className="loading-spinner" />
         </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="admin-container">
+      <div className="admin-header">
+        <h1 className="admin-title">Categorias</h1>
+        <div style={{ display: 'flex', gap: '0.5rem' }}>
+          <Link to="/admin" className="admin-btn admin-btn-secondary">
+            Voltar
+          </Link>
+          {!showForm && (
+            <button
+              className="admin-btn admin-btn-primary"
+              onClick={() => setShowForm(true)}
+            >
+              + Nova Categoria
+            </button>
+          )}
+        </div>
+      </div>
 
         {showForm && (
           <form
@@ -257,11 +292,20 @@ export default function CategoriesAdmin(): JSX.Element {
           </div>
         )}
 
-        {/* Toast */}
-        {toast.show && (
-          <div className={`toast toast-${toast.type}`}>{toast.message}</div>
-        )}
-      </div>
+      {/* Toast */}
+      {toast.show && (
+        <div className={`toast toast-${toast.type}`}>{toast.message}</div>
+      )}
+    </div>
+  );
+}
+
+export default function CategoriesAdmin(): JSX.Element {
+  return (
+    <Layout title="Categorias" description="Gerenciar categorias do FAQ">
+      <BrowserOnly fallback={<div className="loading"><div className="loading-spinner" /></div>}>
+        {() => <CategoriesAdminContent />}
+      </BrowserOnly>
     </Layout>
   );
 }

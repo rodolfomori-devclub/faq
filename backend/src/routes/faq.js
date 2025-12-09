@@ -412,4 +412,193 @@ router.get('/search', (req, res) => {
   }
 });
 
+// ==================== FOOTER LINKS ====================
+
+// GET /api/footer-links - Listar todas as seções do footer
+router.get('/footer-links', (req, res) => {
+  try {
+    const db = readDb();
+    const sections = (db.footerLinks || []).sort((a, b) => a.order - b.order);
+    // Ordenar items dentro de cada seção
+    sections.forEach(section => {
+      if (section.items) {
+        section.items.sort((a, b) => a.order - b.order);
+      }
+    });
+    res.json(sections);
+  } catch (error) {
+    res.status(500).json({ error: 'Erro ao buscar links do footer' });
+  }
+});
+
+// POST /api/footer-links - Criar seção do footer
+router.post('/footer-links', (req, res) => {
+  try {
+    const { title } = req.body;
+
+    if (!title) {
+      return res.status(400).json({ error: 'Título é obrigatório' });
+    }
+
+    const db = readDb();
+    if (!db.footerLinks) db.footerLinks = [];
+
+    const newSection = {
+      id: uuidv4(),
+      title,
+      order: db.footerLinks.length + 1,
+      items: []
+    };
+
+    db.footerLinks.push(newSection);
+    writeDb(db);
+    res.status(201).json(newSection);
+  } catch (error) {
+    res.status(500).json({ error: 'Erro ao criar seção do footer' });
+  }
+});
+
+// PUT /api/footer-links/:id - Atualizar seção do footer
+router.put('/footer-links/:id', (req, res) => {
+  try {
+    const { id } = req.params;
+    const { title, order } = req.body;
+
+    const db = readDb();
+    if (!db.footerLinks) db.footerLinks = [];
+
+    const index = db.footerLinks.findIndex(s => s.id === id);
+
+    if (index === -1) {
+      return res.status(404).json({ error: 'Seção não encontrada' });
+    }
+
+    db.footerLinks[index] = {
+      ...db.footerLinks[index],
+      ...(title && { title }),
+      ...(order !== undefined && { order })
+    };
+
+    writeDb(db);
+    res.json(db.footerLinks[index]);
+  } catch (error) {
+    res.status(500).json({ error: 'Erro ao atualizar seção do footer' });
+  }
+});
+
+// DELETE /api/footer-links/:id - Deletar seção do footer
+router.delete('/footer-links/:id', (req, res) => {
+  try {
+    const { id } = req.params;
+    const db = readDb();
+
+    if (!db.footerLinks) {
+      return res.status(404).json({ error: 'Seção não encontrada' });
+    }
+
+    db.footerLinks = db.footerLinks.filter(s => s.id !== id);
+    writeDb(db);
+    res.json({ message: 'Seção deletada com sucesso' });
+  } catch (error) {
+    res.status(500).json({ error: 'Erro ao deletar seção do footer' });
+  }
+});
+
+// POST /api/footer-links/:sectionId/items - Adicionar link a uma seção
+router.post('/footer-links/:sectionId/items', (req, res) => {
+  try {
+    const { sectionId } = req.params;
+    const { label, href } = req.body;
+
+    if (!label || !href) {
+      return res.status(400).json({ error: 'Label e href são obrigatórios' });
+    }
+
+    const db = readDb();
+    if (!db.footerLinks) db.footerLinks = [];
+
+    const sectionIndex = db.footerLinks.findIndex(s => s.id === sectionId);
+
+    if (sectionIndex === -1) {
+      return res.status(404).json({ error: 'Seção não encontrada' });
+    }
+
+    if (!db.footerLinks[sectionIndex].items) {
+      db.footerLinks[sectionIndex].items = [];
+    }
+
+    const newItem = {
+      id: uuidv4(),
+      label,
+      href,
+      order: db.footerLinks[sectionIndex].items.length + 1
+    };
+
+    db.footerLinks[sectionIndex].items.push(newItem);
+    writeDb(db);
+    res.status(201).json(newItem);
+  } catch (error) {
+    res.status(500).json({ error: 'Erro ao criar link do footer' });
+  }
+});
+
+// PUT /api/footer-links/:sectionId/items/:itemId - Atualizar link
+router.put('/footer-links/:sectionId/items/:itemId', (req, res) => {
+  try {
+    const { sectionId, itemId } = req.params;
+    const { label, href, order } = req.body;
+
+    const db = readDb();
+    if (!db.footerLinks) db.footerLinks = [];
+
+    const sectionIndex = db.footerLinks.findIndex(s => s.id === sectionId);
+
+    if (sectionIndex === -1) {
+      return res.status(404).json({ error: 'Seção não encontrada' });
+    }
+
+    const itemIndex = db.footerLinks[sectionIndex].items?.findIndex(i => i.id === itemId);
+
+    if (itemIndex === -1 || itemIndex === undefined) {
+      return res.status(404).json({ error: 'Link não encontrado' });
+    }
+
+    db.footerLinks[sectionIndex].items[itemIndex] = {
+      ...db.footerLinks[sectionIndex].items[itemIndex],
+      ...(label && { label }),
+      ...(href && { href }),
+      ...(order !== undefined && { order })
+    };
+
+    writeDb(db);
+    res.json(db.footerLinks[sectionIndex].items[itemIndex]);
+  } catch (error) {
+    res.status(500).json({ error: 'Erro ao atualizar link do footer' });
+  }
+});
+
+// DELETE /api/footer-links/:sectionId/items/:itemId - Deletar link
+router.delete('/footer-links/:sectionId/items/:itemId', (req, res) => {
+  try {
+    const { sectionId, itemId } = req.params;
+    const db = readDb();
+
+    if (!db.footerLinks) {
+      return res.status(404).json({ error: 'Seção não encontrada' });
+    }
+
+    const sectionIndex = db.footerLinks.findIndex(s => s.id === sectionId);
+
+    if (sectionIndex === -1) {
+      return res.status(404).json({ error: 'Seção não encontrada' });
+    }
+
+    db.footerLinks[sectionIndex].items = db.footerLinks[sectionIndex].items?.filter(i => i.id !== itemId) || [];
+    writeDb(db);
+    res.json({ message: 'Link deletado com sucesso' });
+  } catch (error) {
+    res.status(500).json({ error: 'Erro ao deletar link do footer' });
+  }
+});
+
 module.exports = router;

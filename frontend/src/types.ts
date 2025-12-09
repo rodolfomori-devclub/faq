@@ -28,3 +28,17 @@ export interface FeaturedCard {
   color: string;
   order: number;
 }
+
+export interface FooterLinkItem {
+  id: string;
+  label: string;
+  href: string;
+  order: number;
+}
+
+export interface FooterSection {
+  id: string;
+  title: string;
+  order: number;
+  items: FooterLinkItem[];
+}

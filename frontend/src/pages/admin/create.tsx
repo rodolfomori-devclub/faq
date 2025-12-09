@@ -9,6 +9,7 @@ function CreateFAQContent(): JSX.Element {
   const history = useHistory();
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
+  const [isAuthorized, setIsAuthorized] = useState(false);
   const [RichTextEditor, setRichTextEditor] = useState<any>(null);
   const [formData, setFormData] = useState({
     categoryId: '',
@@ -22,12 +23,36 @@ function CreateFAQContent(): JSX.Element {
   });
 
   useEffect(() => {
-    fetchCategories();
-    // Dynamic import do editor para evitar SSR issues
-    import('../../components/RichTextEditor').then((module) => {
-      setRichTextEditor(() => module.default);
-    });
+    checkAuthAndFetch();
   }, []);
+
+  const checkAuthAndFetch = async () => {
+    const token = localStorage.getItem('faq_admin_token');
+    if (!token) {
+      window.location.href = '/admin/login';
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_URL}/auth/verify`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await response.json();
+      if (response.ok && data.valid) {
+        setIsAuthorized(true);
+        fetchCategories();
+        // Dynamic import do editor para evitar SSR issues
+        import('../../components/RichTextEditor').then((module) => {
+          setRichTextEditor(() => module.default);
+        });
+      } else {
+        localStorage.removeItem('faq_admin_token');
+        window.location.href = '/admin/login';
+      }
+    } catch (error) {
+      window.location.href = '/admin/login';
+    }
+  };
 
   const fetchCategories = async () => {
     try {
@@ -74,6 +99,16 @@ function CreateFAQContent(): JSX.Element {
       setLoading(false);
     }
   };
+
+  if (!isAuthorized) {
+    return (
+      <div className="admin-container">
+        <div className="loading">
+          <div className="loading-spinner" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="admin-container">

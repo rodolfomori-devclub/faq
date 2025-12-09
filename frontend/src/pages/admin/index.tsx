@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '@theme/Layout';
 import Link from '@docusaurus/Link';
+import BrowserOnly from '@docusaurus/BrowserOnly';
 import { API_URL } from '../../config';
 import type { Category, FAQ } from '../../types';
 
@@ -8,10 +9,11 @@ interface FAQWithCategory extends FAQ {
   categoryName?: string;
 }
 
-export default function AdminDashboard(): JSX.Element {
+function AdminDashboardContent(): JSX.Element {
   const [faqs, setFaqs] = useState<FAQWithCategory[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isAuthorized, setIsAuthorized] = useState(false);
   const [deleteModal, setDeleteModal] = useState<{ show: boolean; faq: FAQ | null }>({
     show: false,
     faq: null,
@@ -23,8 +25,47 @@ export default function AdminDashboard(): JSX.Element {
   });
 
   useEffect(() => {
-    fetchData();
+    checkAuthAndFetch();
   }, []);
+
+  const checkAuthAndFetch = async () => {
+    const token = localStorage.getItem('faq_admin_token');
+
+    if (!token) {
+      window.location.href = '/admin/login';
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_URL}/auth/verify`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.valid) {
+        setIsAuthorized(true);
+        fetchData();
+      } else {
+        localStorage.removeItem('faq_admin_token');
+        window.location.href = '/admin/login';
+      }
+    } catch (error) {
+      window.location.href = '/admin/login';
+    }
+  };
+
+  const handleLogout = () => {
+    const token = localStorage.getItem('faq_admin_token');
+    if (token) {
+      fetch(`${API_URL}/auth/logout`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` }
+      }).catch(console.error);
+    }
+    localStorage.removeItem('faq_admin_token');
+    window.location.href = '/admin/login';
+  };
 
   const fetchData = async () => {
     try {
@@ -76,23 +117,38 @@ export default function AdminDashboard(): JSX.Element {
     }
   };
 
-  return (
-    <Layout title="Admin" description="Painel administrativo do FAQ">
+  if (!isAuthorized) {
+    return (
       <div className="admin-container">
-        <div className="admin-header">
-          <h1 className="admin-title">Gerenciar FAQ</h1>
-          <div style={{ display: 'flex', gap: '0.5rem' }}>
-            <Link to="/admin/cards" className="admin-btn admin-btn-secondary">
-              Cards Destaque
-            </Link>
-            <Link to="/admin/categories" className="admin-btn admin-btn-secondary">
-              Categorias
-            </Link>
-            <Link to="/admin/create" className="admin-btn admin-btn-primary">
-              + Nova Pergunta
-            </Link>
-          </div>
+        <div className="loading">
+          <div className="loading-spinner" />
         </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="admin-container">
+      <div className="admin-header">
+        <h1 className="admin-title">Gerenciar FAQ</h1>
+        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+          <Link to="/admin/cards" className="admin-btn admin-btn-secondary">
+            Cards Destaque
+          </Link>
+          <Link to="/admin/categories" className="admin-btn admin-btn-secondary">
+            Categorias
+          </Link>
+          <Link to="/admin/footer" className="admin-btn admin-btn-secondary">
+            Footer
+          </Link>
+          <Link to="/admin/create" className="admin-btn admin-btn-primary">
+            + Nova Pergunta
+          </Link>
+          <button onClick={handleLogout} className="admin-btn admin-btn-danger">
+            Sair
+          </button>
+        </div>
+      </div>
 
         {loading ? (
           <div className="loading">
@@ -198,11 +254,20 @@ export default function AdminDashboard(): JSX.Element {
           </div>
         )}
 
-        {/* Toast */}
-        {toast.show && (
-          <div className={`toast toast-${toast.type}`}>{toast.message}</div>
-        )}
-      </div>
+      {/* Toast */}
+      {toast.show && (
+        <div className={`toast toast-${toast.type}`}>{toast.message}</div>
+      )}
+    </div>
+  );
+}
+
+export default function AdminDashboard(): JSX.Element {
+  return (
+    <Layout title="Admin" description="Painel administrativo do FAQ">
+      <BrowserOnly fallback={<div className="loading"><div className="loading-spinner" /></div>}>
+        {() => <AdminDashboardContent />}
+      </BrowserOnly>
     </Layout>
   );
 }

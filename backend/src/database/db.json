@@ -229,5 +229,51 @@
       "createdAt": "2025-01-01T00:00:00.000Z",
       "updatedAt": "2025-01-01T00:00:00.000Z"
     }
+  ],
+  "footerLinks": [
+    {
+      "id": "section-1",
+      "title": "Links",
+      "order": 1,
+      "items": [
+        {
+          "id": "link-1",
+          "label": "Site DevClub",
+          "href": "https://devclub.com.br",
+          "order": 1
+        },
+        {
+          "id": "link-2",
+          "label": "Área do Aluno",
+          "href": "https://aluno.devclub.com.br",
+          "order": 2
+        }
+      ]
+    },
+    {
+      "id": "section-2",
+      "title": "Comunidade",
+      "order": 2,
+      "items": [
+        {
+          "id": "link-3",
+          "label": "Discord",
+          "href": "https://discord.gg/devclub",
+          "order": 1
+        },
+        {
+          "id": "link-4",
+          "label": "Instagram",
+          "href": "https://instagram.com/devcluboficial",
+          "order": 2
+        },
+        {
+          "id": "link-5",
+          "label": "YouTube",
+          "href": "https://youtube.com/devclub",
+          "order": 3
+        }
+      ]
+    }
   ]
 }

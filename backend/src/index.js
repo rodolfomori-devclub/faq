@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const faqRoutes = require('./routes/faq');
+const { router: authRoutes } = require('./routes/auth');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -9,11 +10,12 @@ const PORT = process.env.PORT || 3001;
 app.use(cors({
   origin: process.env.FRONTEND_URL || '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type']
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(express.json());
 
 // Rotas
+app.use('/api/auth', authRoutes);
 app.use('/api', faqRoutes);
 
 // Health check

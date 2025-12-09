@@ -3,7 +3,7 @@ import type {Config} from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
 
 const config: Config = {
-  title: 'FAQ DevClub',
+  title: 'DevClub',
   tagline: 'Tire suas dúvidas sobre a Formação DevClub',
   favicon: 'img/favicon.ico',
 
@@ -46,7 +46,7 @@ const config: Config = {
       respectPrefersColorScheme: true,
     },
     navbar: {
-      title: 'FAQ DevClub',
+      title: 'FAQ | DevClub',
       logo: {
         alt: 'DevClub Logo',
         src: 'img/logo-devclub.png',
@@ -66,39 +66,7 @@ const config: Config = {
     },
     footer: {
       style: 'light',
-      links: [
-        {
-          title: 'Links',
-          items: [
-            {
-              label: 'Site DevClub',
-              href: 'https://devclub.com.br',
-            },
-            {
-              label: 'Área do Aluno',
-              href: 'https://aluno.devclub.com.br',
-            },
-          ],
-        },
-        {
-          title: 'Comunidade',
-          items: [
-            {
-              label: 'Discord',
-              href: 'https://discord.gg/devclub',
-            },
-            {
-              label: 'Instagram',
-              href: 'https://instagram.com/devcluboficial',
-            },
-            {
-              label: 'YouTube',
-              href: 'https://youtube.com/devclub',
-            },
-          ],
-        },
-      ],
-      copyright: `© ${new Date().getFullYear()} DevClub. Todos os direitos reservados.`,
+      copyright: ' ',
     },
     prism: {
       theme: prismThemes.github,
