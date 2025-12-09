@@ -1,6 +1,6 @@
 // API Configuration
 export const API_URL = process.env.NODE_ENV === 'production'
-  ? 'https://your-railway-backend.railway.app/api'
+  ? 'https://backend-production-35eb.up.railway.app/api'
   : 'http://localhost:3001/api';
 
 // Cloudinary Configuration
