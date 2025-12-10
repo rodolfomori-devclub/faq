@@ -41,7 +41,7 @@ const config: Config = {
   themeConfig: {
     image: 'img/devclub-social-card.jpg',
     colorMode: {
-      defaultMode: 'light',
+      defaultMode: 'dark',
       disableSwitch: false,
       respectPrefersColorScheme: true,
     },
