@@ -57,11 +57,6 @@ const config: Config = {
           label: 'FAQ',
           position: 'left',
         },
-        {
-          to: '/admin',
-          label: 'Admin',
-          position: 'right',
-        },
       ],
     },
     footer: {
