@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import Layout from '@theme/Layout';
 import BrowserOnly from '@docusaurus/BrowserOnly';
 import './login.css';
+import { API_URL } from '@site/src/config';
+
 
 function LoginContent(): JSX.Element {
   const [email, setEmail] = useState('');
@@ -15,7 +17,7 @@ function LoginContent(): JSX.Element {
     const token = localStorage.getItem('faq_admin_token');
     if (token) {
       // Verificar token
-      fetch('http://localhost:3001/api/auth/verify', {
+      fetch(`${API_URL}/auth/verify`, {
         headers: { 'Authorization': `Bearer ${token}` }
       })
         .then(res => res.json())
@@ -41,7 +43,7 @@ function LoginContent(): JSX.Element {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:3001/api/auth/login', {
+      const response = await fetch(`${API_URL}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
