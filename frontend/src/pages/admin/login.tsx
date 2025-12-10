@@ -29,6 +29,7 @@ function LoginContent(): JSX.Element {
             setIsCheckingAuth(false);
           }
         })
+        
         .catch(() => {
           setIsCheckingAuth(false);
         });
