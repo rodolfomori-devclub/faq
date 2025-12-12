@@ -57,6 +57,11 @@ const config: Config = {
           label: 'FAQ',
           position: 'left',
         },
+        {
+          href: 'https://go.rodolfomori.com.br/suporte',
+          label: 'Suporte',
+          position: 'right',
+        },
       ],
     },
     footer: {
