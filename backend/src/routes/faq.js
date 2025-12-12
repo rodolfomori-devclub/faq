@@ -17,6 +17,39 @@ const writeDb = (data) => {
   fs.writeFileSync(dbPath, JSON.stringify(data, null, 2), 'utf-8');
 };
 
+// ==================== SETTINGS ====================
+
+// GET /api/settings - Obter configurações do site
+router.get('/settings', (req, res) => {
+  try {
+    const db = readDb();
+    res.json(db.settings || {});
+  } catch (error) {
+    res.status(500).json({ error: 'Erro ao buscar configurações' });
+  }
+});
+
+// PUT /api/settings - Atualizar configurações do site
+router.put('/settings', (req, res) => {
+  try {
+    const { supportLink, supportLabel } = req.body;
+    const db = readDb();
+
+    if (!db.settings) db.settings = {};
+
+    db.settings = {
+      ...db.settings,
+      ...(supportLink !== undefined && { supportLink }),
+      ...(supportLabel !== undefined && { supportLabel })
+    };
+
+    writeDb(db);
+    res.json(db.settings);
+  } catch (error) {
+    res.status(500).json({ error: 'Erro ao atualizar configurações' });
+  }
+});
+
 // ==================== FEATURED CARDS ====================
 
 // GET /api/featured-cards - Listar todos os cards em destaque

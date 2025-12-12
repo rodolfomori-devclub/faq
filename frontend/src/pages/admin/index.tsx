@@ -131,7 +131,7 @@ function AdminDashboardContent(): JSX.Element {
     <div className="admin-container">
       <div className="admin-header">
         <h1 className="admin-title">Gerenciar FAQ</h1>
-        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center' }}>
           <Link to="/admin/cards" className="admin-btn admin-btn-secondary">
             Cards Destaque
           </Link>
@@ -140,6 +140,9 @@ function AdminDashboardContent(): JSX.Element {
           </Link>
           <Link to="/admin/footer" className="admin-btn admin-btn-secondary">
             Footer
+          </Link>
+          <Link to="/admin/settings" className="admin-btn admin-btn-secondary">
+            Configurações
           </Link>
           <Link to="/admin/create" className="admin-btn admin-btn-primary">
             + Nova Pergunta

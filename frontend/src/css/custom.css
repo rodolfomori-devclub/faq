@@ -171,6 +171,36 @@ body {
   color: var(--dc-purple);
 }
 
+/* Navbar items spacing */
+.navbar__items--right {
+  gap: 1.5rem;
+}
+
+/* Hide hamburger menu and left items */
+.navbar__toggle,
+.navbar-sidebar,
+.navbar-sidebar__backdrop,
+.navbar__items:not(.navbar__items--right) .navbar__link {
+  display: none !important;
+}
+
+/* Always show right items */
+.navbar__items--right {
+  display: flex !important;
+}
+
+/* Remove external link icon */
+.navbar__link[href*="://"]::after,
+.navbar__link svg,
+.navbar__link .iconExternalLink_node_modules,
+a[class*="navbar__link"] svg {
+  display: none !important;
+}
+
+.navbar__items--right a[href*="://"] svg {
+  display: none !important;
+}
+
 /* ============================================
    FOOTER
    ============================================ */

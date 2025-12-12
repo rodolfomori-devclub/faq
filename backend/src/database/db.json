@@ -1,4 +1,8 @@
 {
+  "settings": {
+    "supportLink": "https://go.rodolfomori.com.br/suporte",
+    "supportLabel": "Suporte"
+  },
   "featuredCards": [
     {
       "id": "fc1",
