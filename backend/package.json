@@ -4,7 +4,7 @@
   "description": "Backend API para FAQ DevClub",
   "main": "src/index.js",
   "scripts": {
-    "start": "prisma migrate deploy && node src/index.js",
+    "start": "npx prisma migrate deploy && node src/index.js",
     "dev": "nodemon src/index.js",
     "postinstall": "prisma generate",
     "prisma:generate": "prisma generate",
