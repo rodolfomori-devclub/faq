@@ -4,12 +4,23 @@
   "description": "Backend API para FAQ DevClub",
   "main": "src/index.js",
   "scripts": {
-    "start": "node src/index.js",
-    "dev": "nodemon src/index.js"
+    "start": "prisma migrate deploy && node src/index.js",
+    "dev": "nodemon src/index.js",
+    "postinstall": "prisma generate",
+    "prisma:generate": "prisma generate",
+    "migrate": "prisma migrate dev",
+    "migrate:deploy": "prisma migrate deploy",
+    "seed": "node prisma/seed.js",
+    "studio": "prisma studio"
+  },
+  "prisma": {
+    "seed": "node prisma/seed.js"
   },
   "dependencies": {
+    "@prisma/client": "^5.22.0",
     "cors": "^2.8.5",
     "express": "^4.18.2",
+    "prisma": "^5.22.0",
     "uuid": "^9.0.0"
   },
   "devDependencies": {

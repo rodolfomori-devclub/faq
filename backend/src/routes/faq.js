@@ -1,51 +1,39 @@
 const express = require('express');
 const router = express.Router();
-const fs = require('fs');
-const path = require('path');
-const { v4: uuidv4 } = require('uuid');
-
-const dbPath = path.join(__dirname, '../database/db.json');
-
-// Helper para ler o banco
-const readDb = () => {
-  const data = fs.readFileSync(dbPath, 'utf-8');
-  return JSON.parse(data);
-};
-
-// Helper para salvar no banco
-const writeDb = (data) => {
-  fs.writeFileSync(dbPath, JSON.stringify(data, null, 2), 'utf-8');
-};
+const prisma = require('../lib/prisma');
 
 // ==================== SETTINGS ====================
 
 // GET /api/settings - Obter configurações do site
-router.get('/settings', (req, res) => {
+router.get('/settings', async (req, res) => {
   try {
-    const db = readDb();
-    res.json(db.settings || {});
+    const settings = await prisma.setting.findUnique({ where: { id: 'default' } });
+    res.json(settings || {});
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: 'Erro ao buscar configurações' });
   }
 });
 
 // PUT /api/settings - Atualizar configurações do site
-router.put('/settings', (req, res) => {
+router.put('/settings', async (req, res) => {
   try {
     const { supportLink, supportLabel } = req.body;
-    const db = readDb();
 
-    if (!db.settings) db.settings = {};
-
-    db.settings = {
-      ...db.settings,
+    const data = {
       ...(supportLink !== undefined && { supportLink }),
-      ...(supportLabel !== undefined && { supportLabel })
+      ...(supportLabel !== undefined && { supportLabel }),
     };
 
-    writeDb(db);
-    res.json(db.settings);
+    const settings = await prisma.setting.upsert({
+      where: { id: 'default' },
+      update: data,
+      create: { id: 'default', ...data },
+    });
+
+    res.json(settings);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: 'Erro ao atualizar configurações' });
   }
 });
@@ -53,18 +41,18 @@ router.put('/settings', (req, res) => {
 // ==================== FEATURED CARDS ====================
 
 // GET /api/featured-cards - Listar todos os cards em destaque
-router.get('/featured-cards', (req, res) => {
+router.get('/featured-cards', async (req, res) => {
   try {
-    const db = readDb();
-    const cards = (db.featuredCards || []).sort((a, b) => a.order - b.order);
+    const cards = await prisma.featuredCard.findMany({ orderBy: { order: 'asc' } });
     res.json(cards);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: 'Erro ao buscar cards em destaque' });
   }
 });
 
 // POST /api/featured-cards - Criar card em destaque
-router.post('/featured-cards', (req, res) => {
+router.post('/featured-cards', async (req, res) => {
   try {
     const { title, description, icon, link, color } = req.body;
 
@@ -72,73 +60,65 @@ router.post('/featured-cards', (req, res) => {
       return res.status(400).json({ error: 'Título e descrição são obrigatórios' });
     }
 
-    const db = readDb();
-    if (!db.featuredCards) db.featuredCards = [];
+    const count = await prisma.featuredCard.count();
 
-    const newCard = {
-      id: uuidv4(),
-      title,
-      description,
-      icon: icon || 'star',
-      link: link || '#',
-      color: color || '#6366f1',
-      order: db.featuredCards.length + 1
-    };
+    const newCard = await prisma.featuredCard.create({
+      data: {
+        title,
+        description,
+        icon: icon || 'star',
+        link: link || '#',
+        color: color || '#6366f1',
+        order: count + 1,
+      },
+    });
 
-    db.featuredCards.push(newCard);
-    writeDb(db);
     res.status(201).json(newCard);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: 'Erro ao criar card em destaque' });
   }
 });
 
 // PUT /api/featured-cards/:id - Atualizar card em destaque
-router.put('/featured-cards/:id', (req, res) => {
+router.put('/featured-cards/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const { title, description, icon, link, color, order } = req.body;
 
-    const db = readDb();
-    if (!db.featuredCards) db.featuredCards = [];
+    const card = await prisma.featuredCard.update({
+      where: { id },
+      data: {
+        ...(title && { title }),
+        ...(description && { description }),
+        ...(icon && { icon }),
+        ...(link && { link }),
+        ...(color && { color }),
+        ...(order !== undefined && { order }),
+      },
+    });
 
-    const index = db.featuredCards.findIndex(c => c.id === id);
-
-    if (index === -1) {
+    res.json(card);
+  } catch (error) {
+    if (error.code === 'P2025') {
       return res.status(404).json({ error: 'Card não encontrado' });
     }
-
-    db.featuredCards[index] = {
-      ...db.featuredCards[index],
-      ...(title && { title }),
-      ...(description && { description }),
-      ...(icon && { icon }),
-      ...(link && { link }),
-      ...(color && { color }),
-      ...(order !== undefined && { order })
-    };
-
-    writeDb(db);
-    res.json(db.featuredCards[index]);
-  } catch (error) {
+    console.error(error);
     res.status(500).json({ error: 'Erro ao atualizar card em destaque' });
   }
 });
 
 // DELETE /api/featured-cards/:id - Deletar card em destaque
-router.delete('/featured-cards/:id', (req, res) => {
+router.delete('/featured-cards/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const db = readDb();
-
-    if (!db.featuredCards) {
-      return res.status(404).json({ error: 'Card não encontrado' });
-    }
-
-    db.featuredCards = db.featuredCards.filter(c => c.id !== id);
-    writeDb(db);
+    await prisma.featuredCard.delete({ where: { id } });
     res.json({ message: 'Card deletado com sucesso' });
   } catch (error) {
+    if (error.code === 'P2025') {
+      return res.status(404).json({ error: 'Card não encontrado' });
+    }
+    console.error(error);
     res.status(500).json({ error: 'Erro ao deletar card em destaque' });
   }
 });
@@ -146,73 +126,21 @@ router.delete('/featured-cards/:id', (req, res) => {
 // ==================== CATEGORIES ====================
 
 // GET /api/categories - Listar todas as categorias
-router.get('/categories', (req, res) => {
+router.get('/categories', async (req, res) => {
   try {
-    const db = readDb();
-    const categories = db.categories.sort((a, b) => a.order - b.order);
+    const categories = await prisma.category.findMany({ orderBy: { order: 'asc' } });
     res.json(categories);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: 'Erro ao buscar categorias' });
   }
 });
 
-// POST /api/categories - Criar categoria
-router.post('/categories', (req, res) => {
-  try {
-    const { name, slug } = req.body;
-    if (!name) {
-      return res.status(400).json({ error: 'Nome é obrigatório' });
-    }
-
-    const db = readDb();
-    const newCategory = {
-      id: uuidv4(),
-      name,
-      slug: slug || name.toLowerCase().replace(/\s+/g, '-').normalize('NFD').replace(/[\u0300-\u036f]/g, ''),
-      order: db.categories.length + 1
-    };
-
-    db.categories.push(newCategory);
-    writeDb(db);
-    res.status(201).json(newCategory);
-  } catch (error) {
-    res.status(500).json({ error: 'Erro ao criar categoria' });
-  }
-});
-
-// PUT /api/categories/:id - Atualizar categoria
-router.put('/categories/:id', (req, res) => {
-  try {
-    const { id } = req.params;
-    const { name, slug, order } = req.body;
-
-    const db = readDb();
-    const index = db.categories.findIndex(c => c.id === id);
-
-    if (index === -1) {
-      return res.status(404).json({ error: 'Categoria não encontrada' });
-    }
-
-    db.categories[index] = {
-      ...db.categories[index],
-      ...(name && { name }),
-      ...(slug && { slug }),
-      ...(order !== undefined && { order })
-    };
-
-    writeDb(db);
-    res.json(db.categories[index]);
-  } catch (error) {
-    res.status(500).json({ error: 'Erro ao atualizar categoria' });
-  }
-});
-
 // GET /api/categories/slug/:slug - Buscar categoria por slug
-router.get('/categories/slug/:slug', (req, res) => {
+router.get('/categories/slug/:slug', async (req, res) => {
   try {
     const { slug } = req.params;
-    const db = readDb();
-    const category = db.categories.find(c => c.slug === slug);
+    const category = await prisma.category.findUnique({ where: { slug } });
 
     if (!category) {
       return res.status(404).json({ error: 'Categoria não encontrada' });
@@ -220,184 +148,126 @@ router.get('/categories/slug/:slug', (req, res) => {
 
     res.json(category);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: 'Erro ao buscar categoria' });
   }
 });
 
-// DELETE /api/categories/:id - Deletar categoria
-router.delete('/categories/:id', (req, res) => {
+// POST /api/categories - Criar categoria
+router.post('/categories', async (req, res) => {
+  try {
+    const { name, slug } = req.body;
+    if (!name) {
+      return res.status(400).json({ error: 'Nome é obrigatório' });
+    }
+
+    const count = await prisma.category.count();
+
+    const newCategory = await prisma.category.create({
+      data: {
+        name,
+        slug:
+          slug ||
+          name
+            .toLowerCase()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .replace(/\s+/g, '-'),
+        order: count + 1,
+      },
+    });
+
+    res.status(201).json(newCategory);
+  } catch (error) {
+    if (error.code === 'P2002') {
+      return res.status(400).json({ error: 'Já existe uma categoria com este slug' });
+    }
+    console.error(error);
+    res.status(500).json({ error: 'Erro ao criar categoria' });
+  }
+});
+
+// PUT /api/categories/:id - Atualizar categoria
+router.put('/categories/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const db = readDb();
+    const { name, slug, order } = req.body;
+
+    const category = await prisma.category.update({
+      where: { id },
+      data: {
+        ...(name && { name }),
+        ...(slug && { slug }),
+        ...(order !== undefined && { order }),
+      },
+    });
+
+    res.json(category);
+  } catch (error) {
+    if (error.code === 'P2025') {
+      return res.status(404).json({ error: 'Categoria não encontrada' });
+    }
+    if (error.code === 'P2002') {
+      return res.status(400).json({ error: 'Já existe uma categoria com este slug' });
+    }
+    console.error(error);
+    res.status(500).json({ error: 'Erro ao atualizar categoria' });
+  }
+});
+
+// DELETE /api/categories/:id - Deletar categoria
+router.delete('/categories/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
 
     // Verificar se há FAQs nesta categoria
-    const hasItems = db.faqs.some(f => f.categoryId === id);
-    if (hasItems) {
+    const hasItems = await prisma.faq.count({ where: { categoryId: id } });
+    if (hasItems > 0) {
       return res.status(400).json({ error: 'Não é possível deletar categoria com itens' });
     }
 
-    db.categories = db.categories.filter(c => c.id !== id);
-    writeDb(db);
+    await prisma.category.delete({ where: { id } });
     res.json({ message: 'Categoria deletada com sucesso' });
   } catch (error) {
+    if (error.code === 'P2025') {
+      return res.status(404).json({ error: 'Categoria não encontrada' });
+    }
+    console.error(error);
     res.status(500).json({ error: 'Erro ao deletar categoria' });
   }
 });
 
+// ==================== FAQS ====================
+
 // GET /api/faqs - Listar todos os FAQs
-router.get('/faqs', (req, res) => {
+router.get('/faqs', async (req, res) => {
   try {
-    const db = readDb();
-    const faqs = db.faqs.sort((a, b) => a.order - b.order);
+    const faqs = await prisma.faq.findMany({ orderBy: { order: 'asc' } });
     res.json(faqs);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: 'Erro ao buscar FAQs' });
   }
 });
 
 // GET /api/faqs/grouped - FAQs agrupados por categoria
-router.get('/faqs/grouped', (req, res) => {
+router.get('/faqs/grouped', async (req, res) => {
   try {
-    const db = readDb();
-    const categories = db.categories.sort((a, b) => a.order - b.order);
-
-    const grouped = categories.map(category => ({
-      ...category,
-      faqs: db.faqs
-        .filter(f => f.categoryId === category.id)
-        .sort((a, b) => a.order - b.order)
-    }));
-
-    res.json(grouped);
+    const categories = await prisma.category.findMany({
+      orderBy: { order: 'asc' },
+      include: {
+        faqs: { orderBy: { order: 'asc' } },
+      },
+    });
+    res.json(categories);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: 'Erro ao buscar FAQs agrupados' });
   }
 });
 
-// GET /api/faqs/:id - Buscar FAQ específico
-router.get('/faqs/:id', (req, res) => {
-  try {
-    const { id } = req.params;
-    const db = readDb();
-    const faq = db.faqs.find(f => f.id === id);
-
-    if (!faq) {
-      return res.status(404).json({ error: 'FAQ não encontrado' });
-    }
-
-    res.json(faq);
-  } catch (error) {
-    res.status(500).json({ error: 'Erro ao buscar FAQ' });
-  }
-});
-
-// GET /api/faqs/category/:categoryId - FAQs por categoria
-router.get('/faqs/category/:categoryId', (req, res) => {
-  try {
-    const { categoryId } = req.params;
-    const db = readDb();
-    const faqs = db.faqs
-      .filter(f => f.categoryId === categoryId)
-      .sort((a, b) => a.order - b.order);
-
-    res.json(faqs);
-  } catch (error) {
-    res.status(500).json({ error: 'Erro ao buscar FAQs da categoria' });
-  }
-});
-
-// POST /api/faqs - Criar FAQ
-router.post('/faqs', (req, res) => {
-  try {
-    const { categoryId, question, answer } = req.body;
-
-    if (!categoryId || !question || !answer) {
-      return res.status(400).json({ error: 'Categoria, pergunta e resposta são obrigatórios' });
-    }
-
-    const db = readDb();
-
-    // Verificar se categoria existe
-    const categoryExists = db.categories.some(c => c.id === categoryId);
-    if (!categoryExists) {
-      return res.status(400).json({ error: 'Categoria não encontrada' });
-    }
-
-    // Calcular próxima ordem
-    const categoryFaqs = db.faqs.filter(f => f.categoryId === categoryId);
-    const nextOrder = categoryFaqs.length > 0
-      ? Math.max(...categoryFaqs.map(f => f.order)) + 1
-      : 1;
-
-    const now = new Date().toISOString();
-    const newFaq = {
-      id: uuidv4(),
-      categoryId,
-      question,
-      answer,
-      order: nextOrder,
-      createdAt: now,
-      updatedAt: now
-    };
-
-    db.faqs.push(newFaq);
-    writeDb(db);
-    res.status(201).json(newFaq);
-  } catch (error) {
-    res.status(500).json({ error: 'Erro ao criar FAQ' });
-  }
-});
-
-// PUT /api/faqs/:id - Atualizar FAQ
-router.put('/faqs/:id', (req, res) => {
-  try {
-    const { id } = req.params;
-    const { categoryId, question, answer, order } = req.body;
-
-    const db = readDb();
-    const index = db.faqs.findIndex(f => f.id === id);
-
-    if (index === -1) {
-      return res.status(404).json({ error: 'FAQ não encontrado' });
-    }
-
-    db.faqs[index] = {
-      ...db.faqs[index],
-      ...(categoryId && { categoryId }),
-      ...(question && { question }),
-      ...(answer && { answer }),
-      ...(order !== undefined && { order }),
-      updatedAt: new Date().toISOString()
-    };
-
-    writeDb(db);
-    res.json(db.faqs[index]);
-  } catch (error) {
-    res.status(500).json({ error: 'Erro ao atualizar FAQ' });
-  }
-});
-
-// DELETE /api/faqs/:id - Deletar FAQ
-router.delete('/faqs/:id', (req, res) => {
-  try {
-    const { id } = req.params;
-    const db = readDb();
-
-    const index = db.faqs.findIndex(f => f.id === id);
-    if (index === -1) {
-      return res.status(404).json({ error: 'FAQ não encontrado' });
-    }
-
-    db.faqs = db.faqs.filter(f => f.id !== id);
-    writeDb(db);
-    res.json({ message: 'FAQ deletado com sucesso' });
-  } catch (error) {
-    res.status(500).json({ error: 'Erro ao deletar FAQ' });
-  }
-});
-
-// PUT /api/faqs/reorder - Reordenar FAQs
-router.put('/faqs/reorder', (req, res) => {
+// PUT /api/faqs/reorder - Reordenar FAQs (antes de /:id para não colidir)
+router.put('/faqs/reorder', async (req, res) => {
   try {
     const { items } = req.body; // [{ id, order }]
 
@@ -405,25 +275,130 @@ router.put('/faqs/reorder', (req, res) => {
       return res.status(400).json({ error: 'Items deve ser um array' });
     }
 
-    const db = readDb();
+    await prisma.$transaction(
+      items.map((item) =>
+        prisma.faq.update({
+          where: { id: item.id },
+          data: { order: item.order },
+        })
+      )
+    );
 
-    items.forEach(item => {
-      const index = db.faqs.findIndex(f => f.id === item.id);
-      if (index !== -1) {
-        db.faqs[index].order = item.order;
-        db.faqs[index].updatedAt = new Date().toISOString();
-      }
-    });
-
-    writeDb(db);
     res.json({ message: 'FAQs reordenados com sucesso' });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: 'Erro ao reordenar FAQs' });
   }
 });
 
+// GET /api/faqs/category/:categoryId - FAQs por categoria
+router.get('/faqs/category/:categoryId', async (req, res) => {
+  try {
+    const { categoryId } = req.params;
+    const faqs = await prisma.faq.findMany({
+      where: { categoryId },
+      orderBy: { order: 'asc' },
+    });
+    res.json(faqs);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Erro ao buscar FAQs da categoria' });
+  }
+});
+
+// GET /api/faqs/:id - Buscar FAQ específico
+router.get('/faqs/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const faq = await prisma.faq.findUnique({ where: { id } });
+
+    if (!faq) {
+      return res.status(404).json({ error: 'FAQ não encontrado' });
+    }
+
+    res.json(faq);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Erro ao buscar FAQ' });
+  }
+});
+
+// POST /api/faqs - Criar FAQ
+router.post('/faqs', async (req, res) => {
+  try {
+    const { categoryId, question, answer } = req.body;
+
+    if (!categoryId || !question || !answer) {
+      return res.status(400).json({ error: 'Categoria, pergunta e resposta são obrigatórios' });
+    }
+
+    // Verificar se categoria existe
+    const category = await prisma.category.findUnique({ where: { id: categoryId } });
+    if (!category) {
+      return res.status(400).json({ error: 'Categoria não encontrada' });
+    }
+
+    // Calcular próxima ordem dentro da categoria
+    const last = await prisma.faq.findFirst({
+      where: { categoryId },
+      orderBy: { order: 'desc' },
+    });
+    const nextOrder = last ? last.order + 1 : 1;
+
+    const newFaq = await prisma.faq.create({
+      data: { categoryId, question, answer, order: nextOrder },
+    });
+
+    res.status(201).json(newFaq);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Erro ao criar FAQ' });
+  }
+});
+
+// PUT /api/faqs/:id - Atualizar FAQ
+router.put('/faqs/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { categoryId, question, answer, order } = req.body;
+
+    const faq = await prisma.faq.update({
+      where: { id },
+      data: {
+        ...(categoryId && { categoryId }),
+        ...(question && { question }),
+        ...(answer && { answer }),
+        ...(order !== undefined && { order }),
+      },
+    });
+
+    res.json(faq);
+  } catch (error) {
+    if (error.code === 'P2025') {
+      return res.status(404).json({ error: 'FAQ não encontrado' });
+    }
+    console.error(error);
+    res.status(500).json({ error: 'Erro ao atualizar FAQ' });
+  }
+});
+
+// DELETE /api/faqs/:id - Deletar FAQ
+router.delete('/faqs/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    await prisma.faq.delete({ where: { id } });
+    res.json({ message: 'FAQ deletado com sucesso' });
+  } catch (error) {
+    if (error.code === 'P2025') {
+      return res.status(404).json({ error: 'FAQ não encontrado' });
+    }
+    console.error(error);
+    res.status(500).json({ error: 'Erro ao deletar FAQ' });
+  }
+});
+
 // GET /api/search - Buscar FAQs
-router.get('/search', (req, res) => {
+router.get('/search', async (req, res) => {
   try {
     const { q } = req.query;
 
@@ -431,16 +406,19 @@ router.get('/search', (req, res) => {
       return res.json([]);
     }
 
-    const db = readDb();
-    const searchTerm = q.toLowerCase();
-
-    const results = db.faqs.filter(faq =>
-      faq.question.toLowerCase().includes(searchTerm) ||
-      faq.answer.toLowerCase().includes(searchTerm)
-    );
+    const results = await prisma.faq.findMany({
+      where: {
+        OR: [
+          { question: { contains: q, mode: 'insensitive' } },
+          { answer: { contains: q, mode: 'insensitive' } },
+        ],
+      },
+      orderBy: { order: 'asc' },
+    });
 
     res.json(results);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: 'Erro na busca' });
   }
 });
@@ -448,24 +426,23 @@ router.get('/search', (req, res) => {
 // ==================== FOOTER LINKS ====================
 
 // GET /api/footer-links - Listar todas as seções do footer
-router.get('/footer-links', (req, res) => {
+router.get('/footer-links', async (req, res) => {
   try {
-    const db = readDb();
-    const sections = (db.footerLinks || []).sort((a, b) => a.order - b.order);
-    // Ordenar items dentro de cada seção
-    sections.forEach(section => {
-      if (section.items) {
-        section.items.sort((a, b) => a.order - b.order);
-      }
+    const sections = await prisma.footerSection.findMany({
+      orderBy: { order: 'asc' },
+      include: {
+        items: { orderBy: { order: 'asc' } },
+      },
     });
     res.json(sections);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: 'Erro ao buscar links do footer' });
   }
 });
 
 // POST /api/footer-links - Criar seção do footer
-router.post('/footer-links', (req, res) => {
+router.post('/footer-links', async (req, res) => {
   try {
     const { title } = req.body;
 
@@ -473,72 +450,61 @@ router.post('/footer-links', (req, res) => {
       return res.status(400).json({ error: 'Título é obrigatório' });
     }
 
-    const db = readDb();
-    if (!db.footerLinks) db.footerLinks = [];
+    const count = await prisma.footerSection.count();
 
-    const newSection = {
-      id: uuidv4(),
-      title,
-      order: db.footerLinks.length + 1,
-      items: []
-    };
+    const section = await prisma.footerSection.create({
+      data: { title, order: count + 1 },
+      include: { items: true },
+    });
 
-    db.footerLinks.push(newSection);
-    writeDb(db);
-    res.status(201).json(newSection);
+    res.status(201).json(section);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: 'Erro ao criar seção do footer' });
   }
 });
 
 // PUT /api/footer-links/:id - Atualizar seção do footer
-router.put('/footer-links/:id', (req, res) => {
+router.put('/footer-links/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const { title, order } = req.body;
 
-    const db = readDb();
-    if (!db.footerLinks) db.footerLinks = [];
+    const section = await prisma.footerSection.update({
+      where: { id },
+      data: {
+        ...(title && { title }),
+        ...(order !== undefined && { order }),
+      },
+    });
 
-    const index = db.footerLinks.findIndex(s => s.id === id);
-
-    if (index === -1) {
+    res.json(section);
+  } catch (error) {
+    if (error.code === 'P2025') {
       return res.status(404).json({ error: 'Seção não encontrada' });
     }
-
-    db.footerLinks[index] = {
-      ...db.footerLinks[index],
-      ...(title && { title }),
-      ...(order !== undefined && { order })
-    };
-
-    writeDb(db);
-    res.json(db.footerLinks[index]);
-  } catch (error) {
+    console.error(error);
     res.status(500).json({ error: 'Erro ao atualizar seção do footer' });
   }
 });
 
-// DELETE /api/footer-links/:id - Deletar seção do footer
-router.delete('/footer-links/:id', (req, res) => {
+// DELETE /api/footer-links/:id - Deletar seção do footer (e seus links em cascata)
+router.delete('/footer-links/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const db = readDb();
-
-    if (!db.footerLinks) {
-      return res.status(404).json({ error: 'Seção não encontrada' });
-    }
-
-    db.footerLinks = db.footerLinks.filter(s => s.id !== id);
-    writeDb(db);
+    await prisma.footerSection.delete({ where: { id } });
     res.json({ message: 'Seção deletada com sucesso' });
   } catch (error) {
+    if (error.code === 'P2025') {
+      return res.status(404).json({ error: 'Seção não encontrada' });
+    }
+    console.error(error);
     res.status(500).json({ error: 'Erro ao deletar seção do footer' });
   }
 });
 
 // POST /api/footer-links/:sectionId/items - Adicionar link a uma seção
-router.post('/footer-links/:sectionId/items', (req, res) => {
+router.post('/footer-links/:sectionId/items', async (req, res) => {
   try {
     const { sectionId } = req.params;
     const { label, href } = req.body;
@@ -547,89 +513,60 @@ router.post('/footer-links/:sectionId/items', (req, res) => {
       return res.status(400).json({ error: 'Label e href são obrigatórios' });
     }
 
-    const db = readDb();
-    if (!db.footerLinks) db.footerLinks = [];
-
-    const sectionIndex = db.footerLinks.findIndex(s => s.id === sectionId);
-
-    if (sectionIndex === -1) {
+    const section = await prisma.footerSection.findUnique({ where: { id: sectionId } });
+    if (!section) {
       return res.status(404).json({ error: 'Seção não encontrada' });
     }
 
-    if (!db.footerLinks[sectionIndex].items) {
-      db.footerLinks[sectionIndex].items = [];
-    }
+    const count = await prisma.footerLink.count({ where: { sectionId } });
 
-    const newItem = {
-      id: uuidv4(),
-      label,
-      href,
-      order: db.footerLinks[sectionIndex].items.length + 1
-    };
+    const item = await prisma.footerLink.create({
+      data: { sectionId, label, href, order: count + 1 },
+    });
 
-    db.footerLinks[sectionIndex].items.push(newItem);
-    writeDb(db);
-    res.status(201).json(newItem);
+    res.status(201).json(item);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: 'Erro ao criar link do footer' });
   }
 });
 
 // PUT /api/footer-links/:sectionId/items/:itemId - Atualizar link
-router.put('/footer-links/:sectionId/items/:itemId', (req, res) => {
+router.put('/footer-links/:sectionId/items/:itemId', async (req, res) => {
   try {
-    const { sectionId, itemId } = req.params;
+    const { itemId } = req.params;
     const { label, href, order } = req.body;
 
-    const db = readDb();
-    if (!db.footerLinks) db.footerLinks = [];
+    const item = await prisma.footerLink.update({
+      where: { id: itemId },
+      data: {
+        ...(label && { label }),
+        ...(href && { href }),
+        ...(order !== undefined && { order }),
+      },
+    });
 
-    const sectionIndex = db.footerLinks.findIndex(s => s.id === sectionId);
-
-    if (sectionIndex === -1) {
-      return res.status(404).json({ error: 'Seção não encontrada' });
-    }
-
-    const itemIndex = db.footerLinks[sectionIndex].items?.findIndex(i => i.id === itemId);
-
-    if (itemIndex === -1 || itemIndex === undefined) {
+    res.json(item);
+  } catch (error) {
+    if (error.code === 'P2025') {
       return res.status(404).json({ error: 'Link não encontrado' });
     }
-
-    db.footerLinks[sectionIndex].items[itemIndex] = {
-      ...db.footerLinks[sectionIndex].items[itemIndex],
-      ...(label && { label }),
-      ...(href && { href }),
-      ...(order !== undefined && { order })
-    };
-
-    writeDb(db);
-    res.json(db.footerLinks[sectionIndex].items[itemIndex]);
-  } catch (error) {
+    console.error(error);
     res.status(500).json({ error: 'Erro ao atualizar link do footer' });
   }
 });
 
 // DELETE /api/footer-links/:sectionId/items/:itemId - Deletar link
-router.delete('/footer-links/:sectionId/items/:itemId', (req, res) => {
+router.delete('/footer-links/:sectionId/items/:itemId', async (req, res) => {
   try {
-    const { sectionId, itemId } = req.params;
-    const db = readDb();
-
-    if (!db.footerLinks) {
-      return res.status(404).json({ error: 'Seção não encontrada' });
-    }
-
-    const sectionIndex = db.footerLinks.findIndex(s => s.id === sectionId);
-
-    if (sectionIndex === -1) {
-      return res.status(404).json({ error: 'Seção não encontrada' });
-    }
-
-    db.footerLinks[sectionIndex].items = db.footerLinks[sectionIndex].items?.filter(i => i.id !== itemId) || [];
-    writeDb(db);
+    const { itemId } = req.params;
+    await prisma.footerLink.delete({ where: { id: itemId } });
     res.json({ message: 'Link deletado com sucesso' });
   } catch (error) {
+    if (error.code === 'P2025') {
+      return res.status(404).json({ error: 'Link não encontrado' });
+    }
+    console.error(error);
     res.status(500).json({ error: 'Erro ao deletar link do footer' });
   }
 });

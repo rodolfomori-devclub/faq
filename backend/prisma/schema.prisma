@@ -1,0 +1,79 @@
+// Prisma schema para o FAQ DevClub
+// Docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Configurações globais do site (linha única, id = "default")
+model Setting {
+  id           String @id @default("default")
+  supportLink  String @default("")
+  supportLabel String @default("")
+}
+
+// Cards em destaque da home
+model FeaturedCard {
+  id          String @id @default(cuid())
+  title       String
+  description String
+  icon        String @default("star")
+  link        String @default("#")
+  color       String @default("#6366f1")
+  order       Int    @default(0)
+}
+
+// Categorias de FAQ
+model Category {
+  id    String @id @default(cuid())
+  name  String
+  slug  String @unique
+  order Int    @default(0)
+  faqs  Faq[]
+}
+
+// Perguntas e respostas
+model Faq {
+  id         String   @id @default(cuid())
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id])
+  question   String
+  answer     String
+  order      Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([categoryId])
+}
+
+// Seções do rodapé
+model FooterSection {
+  id    String       @id @default(cuid())
+  title String
+  order Int          @default(0)
+  items FooterLink[]
+}
+
+// Links dentro de uma seção do rodapé
+model FooterLink {
+  id        String        @id @default(cuid())
+  sectionId String
+  section   FooterSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  label     String
+  href      String
+  order     Int           @default(0)
+
+  @@index([sectionId])
+}
+
+// Tokens de autenticação do admin (expiresAt em ms epoch)
+model AuthToken {
+  token     String @id
+  email     String
+  expiresAt BigInt
+}
